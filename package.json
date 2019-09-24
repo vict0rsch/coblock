@@ -1,0 +1,48 @@
+{
+	"name": "coblock",
+	"displayName": "coblock",
+	"description": "Create a block comment to describe step in code",
+	"version": "0.0.1",
+	"publisher": "vict0rsch",
+	"engines": {
+		"vscode": "^1.38.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:python"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [{
+				"command": "extension.coblockInput",
+				"title": "Block Comment from Input"
+			},
+			{
+				"command": "extension.coblockLine",
+				"title": "Line to Block Comment"
+			}
+		],
+		"keybindings": [{
+			"command": "extension.coblockLine",
+			"key": "ctrl+shift+k",
+			"mac": "cmd+shift+k",
+			"when": "editorTextFocus"
+		}]
+	},
+	"scripts": {
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^10.12.21",
+		"@types/vscode": "^1.38.0",
+		"eslint": "^5.13.0",
+		"glob": "^7.1.4",
+		"mocha": "^6.1.4",
+		"typescript": "^3.3.1",
+		"vscode-test": "^1.2.0"
+	}
+}
