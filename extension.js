@@ -7,7 +7,7 @@ const vscode = require('vscode');
 
 const getMaxLineLen = () => {
     let editorConfig = vscode.workspace.getConfiguration();
-    let maxLineLen = -1;
+    let maxLineLen = 79;
     if ("python" in editorConfig) {
         for (const key in editorConfig.python.linting.pep8Args) {
             if (editorConfig.python.linting.pep8Args.hasOwnProperty(key)) {
