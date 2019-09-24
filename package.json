@@ -2,11 +2,20 @@
 	"name": "coblock",
 	"displayName": "coblock",
 	"description": "Create a block comment to describe step in code",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
+	"license": "SEE LICENSE IN LICENSE.txt",
+	"bugs": {
+		"url": "https://github.com/vict0rsch/coblock/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/vict0rsch/coblock.git"
+	},
+	"homepage": "https://github.com/vict0rsch/coblock",
 	"categories": [
 		"Other"
 	],
