@@ -1,8 +1,8 @@
 {
 	"name": "coblock",
 	"displayName": "coblock",
-	"description": "Create a block comment to describe a step in Python code",
-	"version": "0.1.1",
+	"description": "Create a block comment to describe a step in Python code or YAML config",
+	"version": "0.1.2",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -20,7 +20,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:python"
+		"onLanguage:python",
+		"onLanguage:yaml"
 	],
 	"main": "./extension.js",
 	"contributes": {
