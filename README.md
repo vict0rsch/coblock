@@ -4,6 +4,8 @@
 
 ![usageGif](https://s3.gifyu.com/images/ezgif.com-resize-15da7ed4f4f79417c.gif)
 
+## Usage
+
 ```
 for i in range(n):
     # ----------------------
@@ -36,7 +38,7 @@ Otherwise it will use the standard max line length of 80.
 
 ### Supported Languages 📟
 
-**For now only `#`-based comments are supporterd**. This may change in the future depending if it appears to be needed.
+**For now only `#`-based comments are supporterd**. This may change in the future if it appears to be needed.
 
 This means:
 
