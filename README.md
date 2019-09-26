@@ -2,7 +2,7 @@
 
 The goal of this simple extension is to create comments that structure your code by describing what's in it:
 
-![usageGif]()
+![usageGif](https://s3.gifyu.com/images/ezgif.com-resize-15da7ed4f4f79417c.gif)
 
 ```
 for i in range(n):
