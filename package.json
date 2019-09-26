@@ -1,7 +1,7 @@
 {
 	"name": "coblock",
 	"displayName": "coblock",
-	"description": "Create a block comment to describe a step in Python code or YAML config",
+	"description": "Create a block comment to describe a step in Python code, YAML config and more",
 	"version": "0.1.2",
 	"publisher": "vict0rsch",
 	"engines": {
@@ -21,7 +21,13 @@
 	],
 	"activationEvents": [
 		"onLanguage:python",
-		"onLanguage:yaml"
+		"onLanguage:yaml",
+		"onLanguage:ssh_config",
+		"onLanguage:properties",
+		"onLanguage:perl",
+		"onLanguage:powershell",
+		"onLanguage:ruby",
+		"onLanguage:shellscript"
 	],
 	"main": "./extension.js",
 	"contributes": {

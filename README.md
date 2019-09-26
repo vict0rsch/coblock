@@ -2,6 +2,8 @@
 
 The goal of this simple extension is to create comments that structure your code by describing what's in it:
 
+![usageGif]()
+
 ```
 for i in range(n):
     # ----------------------
