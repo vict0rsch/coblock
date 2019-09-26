@@ -2,7 +2,7 @@
 	"name": "coblock",
 	"displayName": "coblock",
 	"description": "Create a block comment to describe a step in Python code, YAML config and more",
-	"version": "0.1.3",
+	"version": "0.2.0",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -45,7 +45,38 @@
 			"key": "ctrl+shift+k",
 			"mac": "cmd+shift+k",
 			"when": "editorTextFocus"
-		}]
+		}],
+		"configuration": {
+			"title": "Coblock's configuration",
+			"properties": {
+				"coblock.spaceAround": {
+					"type": "integer",
+					"default": 1,
+					"description": "How many spaces around the comment's text (=horizontal margin)",
+					"scope": "resource"
+				},
+				"coblock.boxCharacter": {
+					"type": "string",
+					"default": "-",
+					"description": "What character to draw the box with (only give one, any more would be ignored)"
+				},
+				"coblock.numBlankLines": {
+					"type": "integer",
+					"default": 0,
+					"description": "How many blank lines around the comment's text (=vertical margin)"
+				},
+				"coblock.boxHeight": {
+					"type": "integer",
+					"default": 1,
+					"description": "How many lines of Box Characters around the comment's text (=vertical border height)"
+				},
+				"coblock.boxWidth": {
+					"type": "integer",
+					"default": 5,
+					"description": "How many Box Characters around the comment's text (=horizontal border width)"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"test": "node ./test/runTest.js"

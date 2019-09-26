@@ -35,12 +35,28 @@ You have 2️⃣ options:
 ✂️ If you're using the Python extension and have set pep8's `max-line-length` argument (88 for black formatter for instance), the extension will abide by it and break the comment into multiple lines before writing the block.
 Otherwise it will use the standard max line length of 80.
 
+### Configuration
+
+You can customize 
+
+* the character that draws the box (default: `-`) 
+* the number of spaces around your text in the box (default: `1`)
+* the number of blank lines between your text and the box's border (default: `0`)
+* the height and width of the box's border (default: `1` and `5`)
+
+For intance with **this configuration**:
+
+![config image](https://i.postimg.cc/kG4zPhG4/Capture-d-e-cran-2019-09-26-a-00-44-01.png)
+
+You'll get **this kind of output**:
+
+![long comment](https://i.postimg.cc/V6sHXHjR/Capture-d-e-cran-2019-09-26-a-00-42-54.png)
 
 ### Supported Languages 📟
 
 **For now only `#`-based comments are supporterd**. This may change in the future if it appears to be needed.
 
-This means:
+This means that CoBlock will only be available when working with these languages:
 
 * python
 * yaml

@@ -26,15 +26,27 @@ const getMaxLineLen = () => {
  * @param {number} _offsetCount
  * @param {number} maxLineLen
  */
-const getBlock = (input, _offsetCount, maxLineLen) => {
+const getBlock = (input, _offsetCount, maxLineLen, conf) => {
+
+    const {
+        boxCharacter,
+        spaceAround,
+        numBlankLines,
+        boxWidth,
+        boxHeight
+    } = conf;
+
     const offsetCount = _offsetCount || 0;
     const offset = " ".repeat(offsetCount);
 
     let comment;
-    let linesCount;
     let maxCommentLine = 0
+    let linesCount = 2 * (boxHeight + numBlankLines);
 
-    if (maxLineLen > 0 && input.length > (maxLineLen - 15 - offsetCount)) {
+    const separator = boxCharacter.repeat(boxWidth);
+    const spaces = " ".repeat(spaceAround)
+
+    if (maxLineLen > 0 && input.length > (maxLineLen - 2 - 2 * boxWidth - offsetCount - 2 * spaceAround)) {
         // Line is too long, split it on spaces
         // create as many lines as necessary, no longer than maxLineLen
         // remove offset and CoBlock structure (# ----- bla -----\n)
@@ -45,9 +57,10 @@ const getBlock = (input, _offsetCount, maxLineLen) => {
         while (splitInput.length > 0) {
             const candidate = splitInput.pop();
             if (candidate) {
-                if ((commentLine.length + candidate.length) < (maxLineLen - 15 - offsetCount)) {
+                if ((commentLine.length + candidate.length) < (maxLineLen - 2 - 2 * boxWidth - offsetCount - 2 * spaceAround)) {
                     commentLine += " " + candidate
                 } else {
+                    commentLine = commentLine.trimLeft();
                     comments.push(commentLine);
                     if (commentLine.length > maxCommentLine) {
                         maxCommentLine = commentLine.length
@@ -56,27 +69,41 @@ const getBlock = (input, _offsetCount, maxLineLen) => {
                 }
             }
         }
+        // Store last line
         if (commentLine) {
-            comments.push(commentLine)
+            comments.push(commentLine.trimLeft());
         }
-        linesCount = 2 + comments.length;
-        for (let line of comments) {
-            line += " ".repeat(maxCommentLine - line.length);
-            paddedComments.push(line)
+        // Increase total block line count
+        linesCount += comments.length;
+        // Padd lines
+        for (const line of comments) {
+            paddedComments.push(line + " ".repeat(maxCommentLine - line.length));
         }
+
         comment = "";
         for (const line of paddedComments) {
-            comment += `${offset}# -----${line} -----\n`
+            comment += offset + "# " + separator + spaces + line.trimLeft() + spaces + separator + "\n";
         }
     } else {
-        comment = `${offset}# ----- ${input} -----\n`;
-        maxCommentLine = input.length + 1;
-        linesCount = 3;
+        comment = offset + "# " + separator + spaces + input.trim() + spaces + separator + "\n";
+        maxCommentLine = input.trim().length;
+        linesCount += 1;
     }
 
-    const line1 = `# ${'-'.repeat(maxCommentLine + 11)}\n`;
-    const line2 = `${offset}# ${'-'.repeat(maxCommentLine + 11)}\n${offset}`;
-    const block = line1 + comment + line2;
+    const blankLine = offset + "# " + separator + spaces + " ".repeat(maxCommentLine) + spaces + separator + "\n";
+    const blankLines = blankLine.repeat(numBlankLines)
+
+    const topLine = `# ${boxCharacter.repeat(maxCommentLine + 2 * (spaceAround + boxWidth))}\n`;
+    let topBorder = topLine
+    if (boxHeight > 1) {
+        const offsetTopLine = offset + topLine;
+        topBorder += offsetTopLine.repeat(boxHeight - 1);
+    }
+
+    const bottomLine = `${offset}# ${boxCharacter.repeat(maxCommentLine + 2 * (spaceAround + boxWidth))}\n`;
+    const bottomBorder = bottomLine.repeat(boxHeight) + offset;
+
+    const block = topBorder + blankLines + comment + blankLines + bottomBorder;
     return {
         block,
         linesCount
@@ -94,6 +121,34 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
+
+    const coblockConf = vscode.workspace.getConfiguration('coblock');
+    console.log(coblockConf);
+    let {
+        boxCharacter,
+        spaceAround,
+        numBlankLines,
+        boxWidth,
+        boxHeight
+    } = coblockConf;
+    boxCharacter = boxCharacter[0];
+    spaceAround = spaceAround || 1;
+    spaceAround = Math.max(spaceAround, 0);
+    numBlankLines = numBlankLines || 0;
+    numBlankLines = Math.max(numBlankLines, 0);
+    boxWidth = boxWidth || 5;
+    boxWidth = Math.max(boxWidth, 1);
+    boxHeight = boxHeight || 1;
+    boxHeight = Math.max(boxHeight, 1);
+
+    const conf = {
+        boxCharacter,
+        spaceAround,
+        numBlankLines,
+        boxWidth,
+        boxHeight
+    };
+
     let coblockInput = vscode.commands.registerCommand('extension.coblockInput', async function () {
         // The code you place here will be executed every time your command is executed
 
@@ -108,7 +163,12 @@ function activate(context) {
             const {
                 block,
                 linesCount
-            } = getBlock(input, start.character, maxLineLen)
+            } = getBlock(
+                input,
+                start.character,
+                maxLineLen,
+                conf
+            );
             editor.edit(editBuilder => {
                 editBuilder.insert(start, block);
             });
@@ -130,7 +190,12 @@ function activate(context) {
             const {
                 block,
                 linesCount
-            } = getBlock(input, textLine.firstNonWhitespaceCharacterIndex, maxLineLen)
+            } = getBlock(
+                input,
+                textLine.firstNonWhitespaceCharacterIndex,
+                maxLineLen,
+                conf
+            );
 
             editor.edit(editBuilder => {
                 editBuilder.replace(new vscode.Range(start.line, textLine.firstNonWhitespaceCharacterIndex, start.line + 1, textLine.firstNonWhitespaceCharacterIndex), block);
