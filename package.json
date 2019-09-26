@@ -2,7 +2,7 @@
 	"name": "coblock",
 	"displayName": "coblock",
 	"description": "Create a block comment to describe a step in Python code, YAML config and more",
-	"version": "0.1.2.1",
+	"version": "0.1.3",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
