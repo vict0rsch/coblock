@@ -33,4 +33,4 @@ You have 2 options:
 If you're using the Python extension and have set pep8's `max-line-length` argument (88 for black formatter for instance), the extension will abide by it and break the comment into multiple lines before writing the block.
 Otherwise it will use the standard max line length of 80.
 
-**For now only `#` is supporterd**. This may change in the future depending on needs from the community.
+**For now only `#`-based comments are supporterd**. This may change in the future depending if it appears to be needed.
