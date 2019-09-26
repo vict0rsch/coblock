@@ -73,6 +73,10 @@ This means that CoBlock will only be available when working with these languages
 
 More? Raise an issue ❗️
 
+### To do
+
+Multi-line coblock from selected lines (ETA: Oct. 2019)
+
 ### Disclaimer
 
 This is my first VSCode extension. Things may not be optimimal. Open to help for improvements: use PRs and issues 📣
