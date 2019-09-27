@@ -58,18 +58,43 @@ You'll get **this kind of output**:
 
 ### Supported Languages 📟
 
-**For now only #️⃣-based comments are supporterd**. This may change in the future if it appears to be needed.
+**For now only block comments are supporterd**. This may change in the future if it appears to be needed.
 
-This means that CoBlock will only be available when working with these languages:
+CoBlock is available when working with these languages:
 
-* python
-* yaml
-* ssh_config
-* properties
+* bat
+* c
+* clojure
+* coffeescript
+* c++
+* csharp
+* dockerfile
+* go
+* java
+* javascript
+* javascriptreact
+* jsonc
+* latex
+* less
+* lua
+* makefile
+* matlab
+* objective-c
+* objective-cpp
 * perl
+* php
 * powershell
+* properties
+* python
+* r
 * ruby
+* rust
+* scala
 * shellscrip
+* sql
+* ssh_config
+* swift
+* yaml
 
 More? Raise an issue ❗️
 
