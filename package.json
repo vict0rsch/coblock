@@ -2,7 +2,7 @@
 	"name": "coblock",
 	"displayName": "coblock",
 	"description": "Create a block comment to describe a step in Python, Java, Javascript code, YAML config and many more",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -20,15 +20,21 @@
 		"Other"
 	],
 	"activationEvents": [
+		"onLanguage:python",
 		"onLanguage:bat",
+		"onLanguage:c",
 		"onLanguage:c",
 		"onLanguage:clojure",
 		"onLanguage:coffeescript",
 		"onLanguage:cpp",
 		"onLanguage:csharp",
+		"onLanguage:css",
 		"onLanguage:dockerfile",
 		"onLanguage:go",
+		"onLanguage:html",
 		"onLanguage:java",
+		"onLanguage:java",
+		"onLanguage:javascript",
 		"onLanguage:javascript",
 		"onLanguage:javascriptreact",
 		"onLanguage:jsonc",
@@ -41,32 +47,35 @@
 		"onLanguage:objective-cpp",
 		"onLanguage:perl",
 		"onLanguage:php",
+		"onLanguage:php",
 		"onLanguage:powershell",
 		"onLanguage:properties",
-		"onLanguage:python",
 		"onLanguage:r",
 		"onLanguage:ruby",
 		"onLanguage:rust",
 		"onLanguage:scala",
+		"onLanguage:scss",
 		"onLanguage:shellscrip",
 		"onLanguage:sql",
 		"onLanguage:ssh_config",
 		"onLanguage:swift",
+		"onLanguage:swift",
+		"onLanguage:xml",
 		"onLanguage:yaml"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [{
-				"command": "extension.coblockInput",
+				"command": "coblock.input",
 				"title": "Block Comment from Input"
 			},
 			{
-				"command": "extension.coblockLine",
+				"command": "coblock.line",
 				"title": "Line to Block Comment"
 			}
 		],
 		"keybindings": [{
-			"command": "extension.coblockLine",
+			"command": "coblock.line",
 			"key": "ctrl+shift+k",
 			"mac": "cmd+shift+k",
 			"when": "editorTextFocus"
@@ -99,6 +108,11 @@
 					"type": "integer",
 					"default": 5,
 					"description": "How many Box Characters around the comment's text (=horizontal border width)"
+				},
+				"coblock.preferBlockComment": {
+					"type": "boolean",
+					"default": false,
+					"description": "When possible, use block over inline comments syntax"
 				}
 			}
 		}

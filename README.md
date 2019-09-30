@@ -10,7 +10,7 @@
 
 ## Usage 💡
 
-```
+```python
 for i in range(n):
     # ----------------------
     # ----- Start loop -----
@@ -47,6 +47,7 @@ You can customize 🖌
 * the number of spaces around your text in the box (default: `1`)
 * the number of blank lines between your text and the box's border (default: `0`)
 * the height and width of the box's border (default: `1` and `5`)
+* prefer block over inline syntax for comments when applicable (`c`, `c++`, `java`, `javascript`, `php`, `ruby`, `rust`, `scala`)
 
 For intance with **this configuration**:
 
@@ -56,20 +57,25 @@ You'll get **this kind of output**:
 
 ![long comment](https://i.postimg.cc/V6sHXHjR/Capture-d-e-cran-2019-09-26-a-00-42-54.png)
 
+|                          preferBlockComments: `true`                          |                          preferBlockComments: `true`                          |
+| :---------------------------------------------------------------------------: | :---------------------------------------------------------------------------: |
+| ![](https://i.postimg.cc/hjCckZGs/Capture-d-e-cran-2019-09-29-a-23-40-10.png) | ![](https://i.postimg.cc/KzshqK9s/Capture-d-e-cran-2019-09-29-a-23-39-57.png) |
+
+
 ### Supported Languages 📟
 
-**For now only block comments are supporterd**. This may change in the future if it appears to be needed.
-
-CoBlock is available when working with these languages:
+**CoBlock** is available when working with these languages:
 
 * bat
 * c
+* c++
 * clojure
 * coffeescript
-* c++
 * csharp
+* css
 * dockerfile
 * go
+* html
 * java
 * javascript
 * javascriptreact
@@ -94,14 +100,11 @@ CoBlock is available when working with these languages:
 * sql
 * ssh_config
 * swift
+* xml
 * yaml
-
-More? Raise an issue ❗️
-
-### To do
-
-Multi-line coblock from selected lines (ETA: Oct. 2019)
 
 ### Disclaimer
 
-This is my first VSCode extension. Things may not be optimimal. Open to help for improvements: use PRs and issues 📣
+This is my first VSCode extension. Things may not be optimimal. 
+
+I'm open to help for improvements! Use **PRs** and **issues** 📣 to help or suggest the addition of a language, different comment styles etc.
