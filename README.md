@@ -47,7 +47,7 @@ You can customize 🖌
 * the number of spaces around your text in the box (default: `1`)
 * the number of blank lines between your text and the box's border (default: `0`)
 * the height and width of the box's border (default: `1` and `5`)
-* prefer block over inline syntax for comments when applicable (`c`, `c++`, `java`, `javascript`, `php`, `ruby`, `rust`, `scala`)
+* prefer block over inline syntax for comments (default: `false`) when applicable (`c`, `c++`, `java`, `javascript`, `php`, `ruby`, `rust`, `scala`)
 
 For intance with **this configuration**:
 
@@ -57,7 +57,7 @@ You'll get **this kind of output**:
 
 ![long comment](https://i.postimg.cc/V6sHXHjR/Capture-d-e-cran-2019-09-26-a-00-42-54.png)
 
-|                          preferBlockComments: `true`                          |                          preferBlockComments: `true`                          |
+|                          preferBlockComments: `true`                          |                          preferBlockComments: `false`                          |
 | :---------------------------------------------------------------------------: | :---------------------------------------------------------------------------: |
 | ![](https://i.postimg.cc/hjCckZGs/Capture-d-e-cran-2019-09-29-a-23-40-10.png) | ![](https://i.postimg.cc/KzshqK9s/Capture-d-e-cran-2019-09-29-a-23-39-57.png) |
 
