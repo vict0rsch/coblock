@@ -53,6 +53,14 @@ You have 2️⃣ options:
 ✂️ If you're using the Python 🐍 extension and have set pep8's `max-line-length` argument (88 for Black ◾️ formatter for instance), the extension will abide by it and break the comment into multiple lines before writing the block.
 Otherwise it will use the standard max line length of 79.
 
+### Update existing CoBlock
+
+Just change the content, and `cmd/ctrl + shift + K` again! To add a line, easiest is to just copy paste an existing line and change it. Contribute if you feel that's lame :)
+
+*Warning:* when pressing the keys, make sure the cursor is actually *inside* the CoBlock. 
+
+Your CoBlock will be indented as the **first line** of your selection.
+
 ### Configuration ⚙️
 
 You can customize 🖌
@@ -61,7 +69,8 @@ You can customize 🖌
 * the number of spaces around your text in the box (default: `1`)
 * the number of blank lines between your text and the box's border (default: `0`)
 * the height and width of the box's border (default: `1` and `5`)
-* prefer block over inline syntax for comments (default: `false`) when applicable (`c`, `c++`, `java`, `javascript`, `php`, `ruby`, `rust`, `scala`)
+* prefer block over inline syntax for comments (default: `false`) when applicable (`c`, `c++`, `java`, `javascript`, `php`, `ruby`, `rust`, `scala` ... )
+* if your coblock is multiline, you can control its content's alignment (layout `left`, `center`, `right`)
 
 For intance with **this configuration**:
 
@@ -122,3 +131,8 @@ You'll get **this kind of output**:
 This is my first VSCode extension. Things may not be optimimal. 
 
 I'm open to help for improvements! Use **PRs** and **issues** 📣 to help or suggest the addition of a language, different comment styles etc.
+
+### To Do
+
+* Revert Cobloc (leave only content)
+* Easier add line to coblock (instead of copying previous one and updating content)

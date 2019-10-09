@@ -72,11 +72,11 @@ const blockCommentCharacters = {
         "start": "/*",
         "end": "*/"
     },
-    "php": {
-        "start": "<#",
-        "end": "#>"
-    },
     "cpp": {
+        "start": "/*",
+        "end": "*/"
+    },
+    "php": {
         "start": "<#",
         "end": "#>"
     },

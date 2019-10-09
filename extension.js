@@ -22,7 +22,6 @@ const getExistingBlockContent = (document, selection) => {
 
     let i = selection.start.line;
     let varText = startText;
-    let stop = false;
     while (utils.isContentLine(varText, blockLineStart, blockLineEnd) || reBorderLine.exec(varText)) {
         i -= 1;
         varText = document.lineAt(i).text.trim();
@@ -34,7 +33,8 @@ const getExistingBlockContent = (document, selection) => {
     let contentStartIndex = -1;
     let contentEndIndex = -1;
     while (utils.isContentLine(varText, blockLineStart, blockLineEnd) || reBorderLine.exec(varText)) {
-        if (contentStartIndex < 0 && utils.isContentLine(varText, blockLineStart, blockLineEnd)) {
+
+        if (contentStartIndex < 0 && utils.isContentLine(varText, blockLineStart, blockLineEnd) && !reBorderLine.exec(varText)) {
             contentStartIndex = i;
         }
         if (contentStartIndex > 0 && contentEndIndex < 0 && reBorderLine.exec(varText)) {
@@ -45,20 +45,28 @@ const getExistingBlockContent = (document, selection) => {
         varText = document.lineAt(i).text.trim();
     }
     let blockEndIndex = i;
-    // console.log(contentLines.join("\n"));
-    const input = document.getText(
-        new vscode.Range(new vscode.Position(contentStartIndex, 0), new vscode.Position(contentEndIndex, 0))
-    ).trim().split("\n").map((c, i) => c.replace(blockLineStart, "").replace(blockLineEnd, "").trim()).join("\n")
+    const inputArray = document.getText().split("\n").slice(contentStartIndex, contentEndIndex).filter(c => c)
+    const indentationSize = utils.getMinLeadingSpaces(inputArray.join("\n"));
+    const input = inputArray.map(
+        c => {
+            c = c.trimLeft().replace(blockLineStart, "").replace(blockLineEnd, "").replace("\n", "")
+            if (utils.countLeadingSpaces(c) >= conf.spaceAround) {
+                c = c.slice(conf.spaceAround);
+            }
+            return c
+        }
+    ).join("\n")
 
     if (isBlockComment) {
-        // blockStartIndex -= 1;
-        blockEndIndex += 2;
+        blockStartIndex -= 1;
+        blockEndIndex += 1;
     }
 
     return {
         input,
         blockStartIndex,
-        blockEndIndex
+        blockEndIndex,
+        indentationSize
     }
 }
 
@@ -77,14 +85,22 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
     // create as many lines as necessary, no longer than maxLineLen
 
     let inputLines = inputText.split("\n");
+    const spacesToRemove = inputLines.map(utils.countLeadingSpaces).reduce((a, b) => a < b ? a : b);
+    inputLines = inputLines.map(l => {
+        if (utils.countLeadingSpaces(l) >= spacesToRemove) {
+            l = l.slice(spacesToRemove);
+        }
+        return l
+    })
     let currentMaxContentLength = 0;
     let contentLines = [];
 
     for (const inputLine of inputLines) {
 
-        let words = inputLine.split(" ").reverse();
+        let words = inputLine.trimRight().split(" ").reverse();
         let contentLine = "";
         let stopLine = false;
+        let wordCount = 0;
 
         while (words.length > 0) {
             let word = words.pop();
@@ -92,7 +108,7 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
 
             const newLineLength = contentLine.length + word.length + 1;
             if (newLineLength < maxContentLen) {
-                contentLine += " " + word.replace("\n", "");
+                contentLine += wordCount ? " " + word.replace("\n", "") : word.replace("\n", "");
                 if (word.indexOf("\n") > -1) {
                     stopLine = true;
                     word = "";
@@ -101,7 +117,7 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
                 stopLine = true;
             }
             if (stopLine) {
-                contentLine = contentLine.trimLeft();
+                contentLine = contentLine;
                 contentLines.push(contentLine);
                 if (contentLine.length > currentMaxContentLength) {
                     currentMaxContentLength = contentLine.length;
@@ -113,10 +129,11 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
                 // already added to the current contentLine
                 contentLine = word ? " " + word.replace("\n", "") : "";
             }
+            wordCount += 1;
         }
         // Store last line
         if (contentLine) {
-            contentLine = contentLine.trimLeft();
+            contentLine = contentLine;
             contentLines.push(contentLine);
             if (contentLine.length > currentMaxContentLength) {
                 currentMaxContentLength = contentLine.length;
@@ -228,12 +245,13 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
     cursorOffset = topBorder.split('\n')[0].length;
     if (isBlockComment) {
         topBorder = indentation + commentStart + "\n" + topBorder;
-        bottomBorder = bottomBorder + indentation + commentEnd;
+        bottomBorder = bottomBorder + indentation + commentEnd + "\n";
         linesCount += 2
         cursorOffset = indentationSize + commentEnd.length;
     }
 
     const block = topBorder + blankLines + content + blankLines + bottomBorder;
+
     return {
         block,
         linesCount,
@@ -274,52 +292,51 @@ function coblockLine() {
     // The code you place here will be executed every time your command is executed
 
     // Display a message box to the user
+
+
     let editor = vscode.window.activeTextEditor;
-    let input, startLine, endLine;
+    let input, startLine, endLine, indentationSize;
 
     const languageId = editor.document.languageId;
 
     if (editor) {
+
         const document = editor.document;
         const selection = editor.selection;
         let rangeStartLine, rangeEndLine
-
         if (utils.isCoblock(document, selection)) {
             const existingContent = getExistingBlockContent(document, selection);
             input = existingContent.input;
             rangeStartLine = existingContent.blockStartIndex;
             rangeEndLine = existingContent.blockEndIndex;
+            indentationSize = existingContent.indentationSize
             startLine = document.lineAt(rangeStartLine);
         } else {
-
             rangeStartLine = selection.start.line;
             rangeEndLine = selection.end.line + 1;
-
             if (selection.start.line !== selection.end.line) {
                 // multiline selection
                 startLine = document.lineAt(selection.start.line);
                 endLine = document.lineAt(selection.end.line);
                 input = document.getText(new vscode.Range(
                     selection.start.line,
-                    startLine.firstNonWhitespaceCharacterIndex,
+                    0,
                     selection.end.line,
                     endLine.text.length
                 ));
-
             } else {
                 // single line selection
                 const start = selection.start;
                 startLine = document.lineAt(start.line);
                 endLine = document.lineAt(start.line);
-                input = startLine.text.trim()
+                input = startLine.text.trimRight();
             }
+            indentationSize = utils.getFirstLeadingSpaces(input);
+            input = utils.removeIndentation(input);
         }
 
-        console.log(input)
-        console.log(rangeStartLine)
-        console.log(rangeEndLine)
+        console.log(input);
 
-        const indentationSize = startLine.firstNonWhitespaceCharacterIndex;
         const maxLineLen = utils.getMaxLineLen()
         const {
             block,

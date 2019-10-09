@@ -77,22 +77,24 @@ const getMaxLineLen = () => {
  */
 const isCoblock = (document, selection) => {
 
+    console.log("z");
+
     const conf = getConf();
-
+    console.log("y");
     const startText = document.lineAt(selection.start).text.trim();
-
+    console.log("y");
     const {
         commentCharacters
     } = getCommentCharacters(conf.preferBlockComment, document.languageId)
-
+    console.log("y");
     const commentLine = commentCharacters.line;
-    const blockStart = commentLine + conf.boxCharacter.repeat(conf.boxWidth) + " ".repeat(conf.spaceAround)
-    const blockLineEnd = " ".repeat(conf.spaceAround) + conf.boxCharacter.repeat(conf.boxWidth)
-
-    if (startText.startsWith(blockStart) && startText.endsWith(blockLineEnd)) {
-        return true
+    const blockLineStart = commentLine + conf.boxCharacter.repeat(conf.boxWidth)
+    const blockLineEnd = conf.boxCharacter.repeat(conf.boxWidth)
+    console.log("y");
+    if (isContentLine(startText, blockLineStart, blockLineEnd)) {
+        return true;
     }
-
+    console.log("y");
     const re = new RegExp(`^${commentLine}${conf.boxCharacter}+$`);
     if (re.exec(startText)) {
         let varText = startText;
@@ -101,7 +103,7 @@ const isCoblock = (document, selection) => {
             varText = document.lineAt(selection.start.line + i).text.trim();
             i += 1;
         }
-        if (varText.startsWith(blockStart) && varText.endsWith(blockLineEnd)) {
+        if (isContentLine(varText, blockLineStart, blockLineEnd)) {
             return true
         }
         varText = startText;
@@ -110,7 +112,7 @@ const isCoblock = (document, selection) => {
             varText = document.lineAt(selection.start.line + i).text.trim();
             i -= 1;
         }
-        if (varText.startsWith(blockStart) && varText.endsWith(blockLineEnd)) {
+        if (isContentLine(varText, blockLineStart, blockLineEnd)) {
             return true
         }
     }
@@ -159,12 +161,11 @@ const getConf = () => {
  */
 const getCommentCharacters = (preferBlockComment, languageId) => {
     let commentCharacters, isBlockComment;
-    if (preferBlockComment || !(languageId in languages.inlineCommentCharacters)) {
+    if ((preferBlockComment && languageId in languages.blockCommentCharacters) || !(languageId in languages.inlineCommentCharacters)) {
         commentCharacters = languages.blockCommentCharacters[languageId];
         commentCharacters["line"] = "";
         isBlockComment = true;
     }
-
     if (!commentCharacters) {
         commentCharacters = {
             "start": languages.inlineCommentCharacters[languageId],
@@ -173,14 +174,45 @@ const getCommentCharacters = (preferBlockComment, languageId) => {
         commentCharacters["line"] = commentCharacters.start + " ";
         isBlockComment = false;
     }
-
     if (!commentCharacters.start) throw "Unknown languageId: " + languageId;
-
     return {
         isBlockComment,
         commentCharacters
     }
+}
 
+/**
+ * @param {string} text
+ * @param {number} N
+ */
+const removeOverNSpaces = (text, N) => {
+    return text.split("\n").map(c => {
+        if (countLeadingSpaces(c) >= N) {
+            c = c.slice(N)
+        }
+        return c
+    }).join("\n")
+}
+
+const removeIndentation = text => {
+    const minSpaces = text.split("\n").map(c => countLeadingSpaces(c)).reduce((a, b) => a < b ? a : b);
+    return removeOverNSpaces(text, minSpaces)
+}
+
+/**
+ * @param {string} str
+ */
+const countLeadingSpaces = str => str.replace(/^(\s*).*$/, "$1").length
+
+/**
+ * @param {string} text
+ */
+const getMinLeadingSpaces = text => {
+    return text.split("\n").map(countLeadingSpaces).reduce((a, b) => a < b ? a : b)
+}
+
+const getFirstLeadingSpaces = text => {
+    return countLeadingSpaces(text.split("\n").filter(c => c.trim().length)[0])
 }
 
 module.exports = {
@@ -191,5 +223,10 @@ module.exports = {
     alignRight,
     alignLeft,
     center,
-    isContentLine
+    isContentLine,
+    removeOverNSpaces,
+    removeIndentation,
+    getMinLeadingSpaces,
+    getFirstLeadingSpaces,
+    countLeadingSpaces
 }
