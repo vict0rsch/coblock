@@ -87,32 +87,46 @@
 					"type": "integer",
 					"default": 1,
 					"description": "How many spaces around the comment's text (=horizontal margin)",
-					"scope": "resource"
+					"maximum": 100,
+					"minimum": 0
 				},
 				"coblock.boxCharacter": {
 					"type": "string",
 					"default": "-",
+					"maxLength": 1,
 					"description": "What character to draw the box with (only give one, any more would be ignored)"
 				},
 				"coblock.numBlankLines": {
 					"type": "integer",
 					"default": 0,
+					"maximum": 100,
+					"minimum": 0,
 					"description": "How many blank lines around the comment's text (=vertical margin)"
 				},
 				"coblock.boxHeight": {
 					"type": "integer",
 					"default": 1,
+					"maximum": 100,
+					"minimum": 0,
 					"description": "How many lines of Box Characters around the comment's text (=vertical border height)"
 				},
 				"coblock.boxWidth": {
 					"type": "integer",
 					"default": 5,
+					"maximum": 100,
+					"minimum": 0,
 					"description": "How many Box Characters around the comment's text (=horizontal border width)"
 				},
 				"coblock.preferBlockComment": {
 					"type": "boolean",
 					"default": false,
-					"description": "When possible, use block over inline comments syntax"
+					"description": "When possible (according to language), use block over inline comments syntax"
+				},
+				"coblock.layout": {
+					"type": "string",
+					"default": "alignLeft",
+					"enum": ["left", "center", "right"],
+					"description": "How to align your content inside a multiline block (left, center, right)"
 				}
 			}
 		}

@@ -1,113 +1,65 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
+const utils = require("./utils");
 
-const inlineCommentCharacters = {
-    "bat": "REM ",
-    "c": "//",
-    "clojure": ";",
-    "coffeescript": "#",
-    "cpp": "//",
-    "csharp": "//",
-    "dockerfile": "#",
-    "go": "//",
-    "java": "//",
-    "javascript": "//",
-    "javascriptreact": "//",
-    "jsonc": "//",
-    "latex": "%",
-    "less": "//",
-    "lua": "--",
-    "makefile": "#",
-    "matlab": "%",
-    "objective-c": "//",
-    "objective-cpp": "//",
-    "perl": "#",
-    "php": "#",
-    "powershell": "#",
-    "properties": "#",
-    "python": "#",
-    "r": "#",
-    "ruby": "#",
-    "rust": "//",
-    "scala": "//",
-    "scss": "//",
-    "shellscrip": "#",
-    "sql": "--",
-    "ssh_config": "#",
-    "swift": "//",
-    "yaml": "#",
-};
+/**
+ * @param {import("vscode").TextDocument} document
+ * @param {import("vscode").Selection} selection
+ */
+const getExistingBlockContent = (document, selection) => {
+    const conf = utils.getConf();
+    const {
+        isBlockComment,
+        commentCharacters
+    } = utils.getCommentCharacters(conf.preferBlockComment, document.languageId)
+    const commentLine = commentCharacters.line;
 
-const blockCommentCharacters = {
-    "html": {
-        "start": "<!--",
-        "end": "-->"
-    },
-    "xml": {
-        "start": "<!--",
-        "end": "-->"
-    },
-    "css": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "c": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "java": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "javascript": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "swift": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "rust": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "scala": {
-        "start": "/*",
-        "end": "*/"
-    },
-    "php": {
-        "start": "<#",
-        "end": "#>"
-    },
-    "c": {
-        "start": "<#",
-        "end": "#>"
-    },
-    "cpp": {
-        "start": "<#",
-        "end": "#>"
-    },
-    "ruby": {
-        "start": "=begin",
-        "end": "=end"
+    const startText = document.lineAt(selection.start).text.trim();
+    const blockLineStart = commentLine + conf.boxCharacter.repeat(conf.boxWidth);
+    const blockLineEnd = conf.boxCharacter.repeat(conf.boxWidth);
+    const reBorderLine = new RegExp(`^${commentLine}${conf.boxCharacter}+$`);
+
+    let i = selection.start.line;
+    let varText = startText;
+    let stop = false;
+    while (utils.isContentLine(varText, blockLineStart, blockLineEnd) || reBorderLine.exec(varText)) {
+        i -= 1;
+        varText = document.lineAt(i).text.trim();
     }
-};
-
-const getMaxLineLen = () => {
-    let editorConfig = vscode.workspace.getConfiguration();
-    let maxLineLen = 79;
-    if ("python" in editorConfig) {
-        for (const key in editorConfig.python.linting.pep8Args) {
-            if (editorConfig.python.linting.pep8Args.hasOwnProperty(key)) {
-                const element = editorConfig.python.linting.pep8Args[key];
-                if (element.indexOf("--max-line-length") > -1) {
-                    maxLineLen = parseInt(element.split("=")[1], 10)
-                }
-            }
+    i += 1;
+    let blockStartIndex = i;
+    varText = document.lineAt(i).text.trim();
+    let contentLines = [];
+    let contentStartIndex = -1;
+    let contentEndIndex = -1;
+    while (utils.isContentLine(varText, blockLineStart, blockLineEnd) || reBorderLine.exec(varText)) {
+        if (contentStartIndex < 0 && utils.isContentLine(varText, blockLineStart, blockLineEnd)) {
+            contentStartIndex = i;
         }
+        if (contentStartIndex > 0 && contentEndIndex < 0 && reBorderLine.exec(varText)) {
+            contentEndIndex = i;
+        }
+        contentLines.push(varText);
+        i += 1;
+        varText = document.lineAt(i).text.trim();
     }
-    return maxLineLen
+    let blockEndIndex = i;
+    // console.log(contentLines.join("\n"));
+    const input = document.getText(
+        new vscode.Range(new vscode.Position(contentStartIndex, 0), new vscode.Position(contentEndIndex, 0))
+    ).trim().split("\n").map((c, i) => c.replace(blockLineStart, "").replace(blockLineEnd, "").trim()).join("\n")
+
+    if (isBlockComment) {
+        // blockStartIndex -= 1;
+        blockEndIndex += 2;
+    }
+
+    return {
+        input,
+        blockStartIndex,
+        blockEndIndex
+    }
 }
 
 /**
@@ -117,8 +69,9 @@ const getMaxLineLen = () => {
  * @param {string} commentLine
  * @param {string} separator
  * @param {string} spaces
+ * @param {string} layout
  */
-const getMultilineContent = (inputText, maxContentLen, indentation, commentLine, separator, spaces) => {
+const getMultilineContent = (inputText, maxContentLen, indentation, commentLine, separator, spaces, layout) => {
     // inputText is too long or contains multiple lines
     // Treat each line independently, split it on spaces
     // create as many lines as necessary, no longer than maxLineLen
@@ -135,7 +88,7 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
 
         while (words.length > 0) {
             let word = words.pop();
-            if (!word) continue;
+            // if (!word) continue;
 
             const newLineLength = contentLine.length + word.length + 1;
             if (newLineLength < maxContentLen) {
@@ -174,49 +127,26 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
 
     // Padd lines
     // (may raise "invalid count value" if there was an error computing currentMaxContentLength)
-    const paddedContentLines = contentLines.map(
-        (line, i) => line + " ".repeat(currentMaxContentLength - line.length)
-    );
+    const paddedContentLines = layout === "center" ?
+        utils.center(contentLines, currentMaxContentLength) :
+        layout === "right" ?
+        utils.alignRight(contentLines, currentMaxContentLength) :
+        utils.alignLeft(contentLines, currentMaxContentLength);
 
     return {
-        content: paddedContentLines.map(
-            (line, i) => indentation + commentLine + separator + spaces + line.trimLeft() + spaces + separator
-        ).join("\n") + "\n",
+        content:
+            /**
+             * @param {string} line
+             * @param {number} i
+             */
+            paddedContentLines.map(
+                (line, i) => indentation + commentLine + separator + spaces + line + spaces + separator
+            ).join("\n") + "\n",
         linesCount: contentLines.length,
         maxContentLength: currentMaxContentLength
     }
 }
 
-const getConf = () => {
-    const coblockConf = vscode.workspace.getConfiguration('coblock');
-
-    let {
-        boxCharacter,
-        spaceAround,
-        numBlankLines,
-        boxWidth,
-        boxHeight,
-        preferBlockComment
-    } = coblockConf;
-    boxCharacter = boxCharacter[0];
-    spaceAround = spaceAround || 1;
-    spaceAround = Math.max(spaceAround, 0);
-    numBlankLines = numBlankLines || 0;
-    numBlankLines = Math.max(numBlankLines, 0);
-    boxWidth = boxWidth || 5;
-    boxWidth = Math.max(boxWidth, 1);
-    boxHeight = boxHeight || 1;
-    boxHeight = Math.max(boxHeight, 1);
-
-    return {
-        boxCharacter,
-        spaceAround,
-        numBlankLines,
-        boxWidth,
-        boxHeight,
-        preferBlockComment
-    };
-}
 
 /**
  * @param {string} inputText
@@ -235,9 +165,10 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
         numBlankLines,
         boxWidth,
         boxHeight,
-        preferBlockComment
-    } = getConf();
-    let commentCharacters, commentLine, isBlockComment, content, cursorOffset, maxContentLength;
+        preferBlockComment,
+        layout
+    } = utils.getConf();
+    let content, cursorOffset, maxContentLength;
     const indentationSize = _offsetCount || 0;
     const indentation = " ".repeat(indentationSize);
     let linesCount = 2 * (boxHeight + numBlankLines);
@@ -247,25 +178,13 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
     // -----    Set Comment Params    -----
     // ------------------------------------
 
-    if (preferBlockComment || !(languageId in inlineCommentCharacters)) {
-        commentCharacters = blockCommentCharacters[languageId];
-        commentLine = "";
-        isBlockComment = true;
-    }
-
-    if (!commentCharacters) {
-        commentCharacters = {
-            "start": inlineCommentCharacters[languageId],
-            "end": ""
-        };
-        commentLine = commentCharacters.start + " ";
-        isBlockComment = false;
-    }
-
-    if (!commentCharacters.start) throw "Unknown languageId: " + languageId;
-
-    let commentStart = commentCharacters.start;
-    let commentEnd = commentCharacters.end;
+    const {
+        isBlockComment,
+        commentCharacters
+    } = utils.getCommentCharacters(preferBlockComment, languageId)
+    const commentStart = commentCharacters.start;
+    const commentEnd = commentCharacters.end;
+    const commentLine = commentCharacters.line;
 
     // remove left indentation (= indentation)
     // remove the left and right width and spaces arount the content
@@ -282,9 +201,17 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
         (maxLineLen > 0 && inputText.length > maxContentLen) ||
         inputText.indexOf("\n") > -1
     ) {
-        const multilineContent = getMultilineContent(inputText, maxContentLen, indentation, commentLine, separator, spaces);
+        const multilineContent = getMultilineContent(
+            inputText,
+            maxContentLen,
+            indentation,
+            commentLine,
+            separator,
+            spaces,
+            layout
+        );
         content = multilineContent.content;
-        linesCount = multilineContent.linesCount;
+        linesCount += multilineContent.linesCount;
         maxContentLength = multilineContent.maxContentLength;
     } else {
         // inputText is not too long nor is it multiline
@@ -292,6 +219,7 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
         maxContentLength = inputText.trim().length;
         linesCount += 1;
     }
+
     const blockWidth = maxContentLength + 2 * (spaceAround + boxWidth);
     const blankLines = (indentation + commentLine + separator + spaces + " ".repeat(maxContentLength) + spaces + separator + "\n").repeat(numBlankLines);
     let topBorder = (indentation + commentLine + boxCharacter.repeat(blockWidth) + "\n").repeat(boxHeight);
@@ -321,7 +249,7 @@ async function coblockInput() {
 
     let editor = vscode.window.activeTextEditor;
     const languageId = editor.document.languageId;
-    const maxLineLen = getMaxLineLen();
+    const maxLineLen = utils.getMaxLineLen();
 
     if (editor) {
         let start = editor.selection.start;
@@ -354,28 +282,45 @@ function coblockLine() {
     if (editor) {
         const document = editor.document;
         const selection = editor.selection;
+        let rangeStartLine, rangeEndLine
 
-        if (selection.start.line !== selection.end.line) {
-            // multiline selection
-            startLine = document.lineAt(selection.start.line);
-            endLine = document.lineAt(selection.end.line);
-            input = document.getText(new vscode.Range(
-                selection.start.line,
-                startLine.firstNonWhitespaceCharacterIndex,
-                selection.end.line,
-                endLine.text.length
-            ));
-
+        if (utils.isCoblock(document, selection)) {
+            const existingContent = getExistingBlockContent(document, selection);
+            input = existingContent.input;
+            rangeStartLine = existingContent.blockStartIndex;
+            rangeEndLine = existingContent.blockEndIndex;
+            startLine = document.lineAt(rangeStartLine);
         } else {
-            // single line selection
-            const start = selection.start;
-            startLine = document.lineAt(start.line);
-            endLine = document.lineAt(start.line);
-            input = startLine.text.trim()
+
+            rangeStartLine = selection.start.line;
+            rangeEndLine = selection.end.line + 1;
+
+            if (selection.start.line !== selection.end.line) {
+                // multiline selection
+                startLine = document.lineAt(selection.start.line);
+                endLine = document.lineAt(selection.end.line);
+                input = document.getText(new vscode.Range(
+                    selection.start.line,
+                    startLine.firstNonWhitespaceCharacterIndex,
+                    selection.end.line,
+                    endLine.text.length
+                ));
+
+            } else {
+                // single line selection
+                const start = selection.start;
+                startLine = document.lineAt(start.line);
+                endLine = document.lineAt(start.line);
+                input = startLine.text.trim()
+            }
         }
 
+        console.log(input)
+        console.log(rangeStartLine)
+        console.log(rangeEndLine)
+
         const indentationSize = startLine.firstNonWhitespaceCharacterIndex;
-        const maxLineLen = getMaxLineLen()
+        const maxLineLen = utils.getMaxLineLen()
         const {
             block,
             linesCount,
@@ -389,15 +334,16 @@ function coblockLine() {
 
         // replace document content with comment block
         editor.edit(editBuilder => {
-            editBuilder.replace(new vscode.Range(selection.start.line, 0, selection.end.line + 1, indentationSize), block);
+            editBuilder.replace(new vscode.Range(rangeStartLine, 0, rangeEndLine, 0), block);
         });
 
         // position cursor at the end of the added comment block
         const p = new vscode.Position(
-            selection.start.line + linesCount - 1,
+            rangeStartLine + linesCount - 1,
             cursorOffset
         );
         vscode.window.activeTextEditor.selection = new vscode.Selection(p, p);
+
     }
 }
 

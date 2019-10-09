@@ -10,12 +10,26 @@
 
 ## Usage 💡
 
+In short:
+
+1. write some content
+2. press `cmd/ctrl + shift + K`
+   * (If your content is on multiple lines, select those lines before pressing the keys)
+
+Example:
+
 ```python
 for i in range(n):
     # ----------------------
     # ----- Start loop -----
     # ----------------------
     dosomething()
+
+    # -----------------------------------------
+    # ----- This is an interesting part   -----
+    # ----- of your superb code.          -----
+    # ----- Share it with your community! -----
+    # -----------------------------------------
 
     dosomethingelse()
 
@@ -57,7 +71,7 @@ You'll get **this kind of output**:
 
 ![long comment](https://i.postimg.cc/V6sHXHjR/Capture-d-e-cran-2019-09-26-a-00-42-54.png)
 
-|                          preferBlockComments: `true`                          |                          preferBlockComments: `false`                          |
+|                          preferBlockComments: `true`                          |                         preferBlockComments: `false`                          |
 | :---------------------------------------------------------------------------: | :---------------------------------------------------------------------------: |
 | ![](https://i.postimg.cc/hjCckZGs/Capture-d-e-cran-2019-09-29-a-23-40-10.png) | ![](https://i.postimg.cc/KzshqK9s/Capture-d-e-cran-2019-09-29-a-23-39-57.png) |
 
