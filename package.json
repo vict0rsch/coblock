@@ -2,7 +2,7 @@
 	"name": "coblock",
 	"displayName": "coblock",
 	"description": "Create a block comment to describe a step in Python, Java, Javascript code, YAML config and many more",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -23,7 +23,6 @@
 		"onLanguage:python",
 		"onLanguage:bat",
 		"onLanguage:c",
-		"onLanguage:c",
 		"onLanguage:clojure",
 		"onLanguage:coffeescript",
 		"onLanguage:cpp",
@@ -32,9 +31,8 @@
 		"onLanguage:dockerfile",
 		"onLanguage:go",
 		"onLanguage:html",
+		"onLanguage:ignore",
 		"onLanguage:java",
-		"onLanguage:java",
-		"onLanguage:javascript",
 		"onLanguage:javascript",
 		"onLanguage:javascriptreact",
 		"onLanguage:jsonc",
@@ -47,7 +45,6 @@
 		"onLanguage:objective-cpp",
 		"onLanguage:perl",
 		"onLanguage:php",
-		"onLanguage:php",
 		"onLanguage:powershell",
 		"onLanguage:properties",
 		"onLanguage:r",
@@ -58,7 +55,6 @@
 		"onLanguage:shellscrip",
 		"onLanguage:sql",
 		"onLanguage:ssh_config",
-		"onLanguage:swift",
 		"onLanguage:swift",
 		"onLanguage:xml",
 		"onLanguage:yaml"

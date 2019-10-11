@@ -99,6 +99,7 @@ You'll get **this kind of output**:
 * dockerfile
 * go
 * html
+* ignore
 * java
 * javascript
 * javascriptreact

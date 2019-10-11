@@ -214,6 +214,10 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
     const spaces = " ".repeat(spaceAround);
 
 
+    // ------------------------------------------------------------------------
+    // -----   Infer content, linesCount and maxContentLen depending on   -----
+    // -----   whether or not the input text is on multiple line or not   -----
+    // ------------------------------------------------------------------------
     if (
         (maxLineLen > 0 && inputText.length > maxContentLen) ||
         inputText.indexOf("\n") > -1
@@ -237,6 +241,10 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
         linesCount += 1;
     }
 
+    // ---------------------------------------------------------
+    // -----   Create Block from content and User config   -----
+    // ---------------------------------------------------------
+
     const blockWidth = maxContentLength + 2 * (spaceAround + boxWidth);
     const blankLines = (indentation + commentLine + separator + spaces + " ".repeat(maxContentLength) + spaces + separator + "\n").repeat(numBlankLines);
     let topBorder = (indentation + commentLine + boxCharacter.repeat(blockWidth) + "\n").repeat(boxHeight);
@@ -258,6 +266,11 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
         cursorOffset
     }
 }
+
+// ----------------------------------------------
+// -----   Use CoBlock from palette input   -----
+// -----   May become deprecated            -----
+// ----------------------------------------------
 
 async function coblockInput() {
     // The code you place here will be executed every time your command is executed
@@ -286,6 +299,10 @@ async function coblockInput() {
         });
     }
 }
+
+// ---------------------------------------------
+// -----   Main function used in CoBlock   -----
+// ---------------------------------------------
 
 function coblockLine() {
 

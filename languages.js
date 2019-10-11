@@ -7,6 +7,7 @@ const inlineCommentCharacters = {
     "csharp": "//",
     "dockerfile": "#",
     "go": "//",
+    "ignore": "#",
     "java": "//",
     "javascript": "//",
     "javascriptreact": "//",
