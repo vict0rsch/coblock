@@ -322,13 +322,17 @@ function coblockLine() {
         const selection = editor.selection;
         let rangeStartLine, rangeEndLine
         if (utils.isCoblock(document, selection)) {
+            // console.log("Updating CoBlock");
             const existingContent = getExistingBlockContent(document, selection);
+            // console.log("Existing content:");
+            // console.log(existingContent);
             input = existingContent.input;
             rangeStartLine = existingContent.blockStartIndex;
             rangeEndLine = existingContent.blockEndIndex;
             indentationSize = existingContent.indentationSize
             startLine = document.lineAt(rangeStartLine);
         } else {
+            // console.log('Creating CoBlock:');
             rangeStartLine = selection.start.line;
             rangeEndLine = selection.end.line + 1;
             if (selection.start.line !== selection.end.line) {
@@ -348,11 +352,15 @@ function coblockLine() {
                 endLine = document.lineAt(start.line);
                 input = startLine.text.trimRight();
             }
+            // console.log(input);
             indentationSize = utils.getFirstLeadingSpaces(input);
             input = utils.removeIndentation(input);
+            // console.log(input);
+            // console.log(startLine);
+            // console.log(endLine);
         }
 
-        console.log(input);
+        // console.log(input);
 
         const maxLineLen = utils.getMaxLineLen()
         const {

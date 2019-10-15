@@ -77,24 +77,18 @@ const getMaxLineLen = () => {
  */
 const isCoblock = (document, selection) => {
 
-    console.log("z");
 
     const conf = getConf();
-    console.log("y");
     const startText = document.lineAt(selection.start).text.trim();
-    console.log("y");
     const {
         commentCharacters
     } = getCommentCharacters(conf.preferBlockComment, document.languageId)
-    console.log("y");
     const commentLine = commentCharacters.line;
     const blockLineStart = commentLine + conf.boxCharacter.repeat(conf.boxWidth)
     const blockLineEnd = conf.boxCharacter.repeat(conf.boxWidth)
-    console.log("y");
     if (isContentLine(startText, blockLineStart, blockLineEnd)) {
         return true;
     }
-    console.log("y");
     const re = new RegExp(`^${commentLine}${conf.boxCharacter}+$`);
     if (re.exec(startText)) {
         let varText = startText;
@@ -202,7 +196,7 @@ const removeIndentation = text => {
 /**
  * @param {string} str
  */
-const countLeadingSpaces = str => str.replace(/^(\s*).*$/, "$1").length
+const countLeadingSpaces = str => str.search(/\S|$/)
 
 /**
  * @param {string} text
