@@ -122,7 +122,8 @@ const getConf = () => {
         boxWidth,
         boxHeight,
         preferBlockComment,
-        layout
+        layout,
+        maxLineLength
     } = coblockConf;
     boxCharacter = boxCharacter[0];
     spaceAround = spaceAround || 1;
@@ -144,7 +145,8 @@ const getConf = () => {
         boxWidth,
         boxHeight,
         preferBlockComment,
-        layout
+        layout,
+        maxLineLength
     };
 }
 

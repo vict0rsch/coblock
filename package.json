@@ -1,8 +1,8 @@
 {
 	"name": "coblock",
 	"displayName": "coblock",
-	"description": "Create a block comment to describe a step in Python, Java, Javascript code, YAML config and many more",
-	"version": "0.5.2",
+	"description": "Improve code readability by inserting styled headers as block comments to describe an important step in your Python, Java, Javascript code, YAML config and many more",
+	"version": "0.5.4",
 	"publisher": "vict0rsch",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -20,48 +20,12 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:python",
-		"onLanguage:bat",
-		"onLanguage:c",
-		"onLanguage:clojure",
-		"onLanguage:coffeescript",
-		"onLanguage:cpp",
-		"onLanguage:csharp",
-		"onLanguage:css",
-		"onLanguage:dockerfile",
-		"onLanguage:go",
-		"onLanguage:html",
-		"onLanguage:ignore",
-		"onLanguage:java",
-		"onLanguage:javascript",
-		"onLanguage:javascriptreact",
-		"onLanguage:jsonc",
-		"onLanguage:latex",
-		"onLanguage:less",
-		"onLanguage:lua",
-		"onLanguage:makefile",
-		"onLanguage:matlab",
-		"onLanguage:objective-c",
-		"onLanguage:objective-cpp",
-		"onLanguage:perl",
-		"onLanguage:php",
-		"onLanguage:powershell",
-		"onLanguage:properties",
-		"onLanguage:r",
-		"onLanguage:ruby",
-		"onLanguage:rust",
-		"onLanguage:scala",
-		"onLanguage:scss",
-		"onLanguage:shellscrip",
-		"onLanguage:sql",
-		"onLanguage:ssh_config",
-		"onLanguage:swift",
-		"onLanguage:xml",
-		"onLanguage:yaml"
+		"*"
 	],
 	"main": "./extension.js",
 	"contributes": {
-		"commands": [{
+		"commands": [
+			{
 				"command": "coblock.input",
 				"title": "Block Comment from Input"
 			},
@@ -70,12 +34,14 @@
 				"title": "Line to Block Comment"
 			}
 		],
-		"keybindings": [{
-			"command": "coblock.line",
-			"key": "ctrl+shift+k",
-			"mac": "cmd+shift+k",
-			"when": "editorTextFocus"
-		}],
+		"keybindings": [
+			{
+				"command": "coblock.line",
+				"key": "ctrl+shift+k",
+				"mac": "cmd+shift+k",
+				"when": "editorTextFocus"
+			}
+		],
 		"configuration": {
 			"title": "Coblock's configuration",
 			"properties": {
@@ -85,6 +51,13 @@
 					"description": "How many spaces around the comment's text (=horizontal margin)",
 					"maximum": 100,
 					"minimum": 0
+				},
+				"coblock.maxLineLength":{
+					"type": "integer",
+					"default": 79,
+					"minimum": 50,
+					"maximum": 250,
+					"description": "Maximum line length allowed to break down content into new lines, counting indentation and box characters. This is not the box's width"
 				},
 				"coblock.boxCharacter": {
 					"type": "string",
@@ -121,7 +94,11 @@
 				"coblock.layout": {
 					"type": "string",
 					"default": "alignLeft",
-					"enum": ["left", "center", "right"],
+					"enum": [
+						"left",
+						"center",
+						"right"
+					],
 					"description": "How to align your content inside a multiline block (left, center, right)"
 				}
 			}

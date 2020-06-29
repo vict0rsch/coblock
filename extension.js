@@ -105,9 +105,9 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
         while (words.length > 0) {
             let word = words.pop();
             // if (!word) continue;
-
+            stopLine = false
             const newLineLength = contentLine.length + word.length + 1;
-            if (newLineLength < maxContentLen) {
+            if (newLineLength <= maxContentLen) {
                 contentLine += wordCount ? " " + word.replace("\n", "") : word.replace("\n", "");
                 if (word.indexOf("\n") > -1) {
                     stopLine = true;
@@ -122,14 +122,16 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
                 if (contentLine.length > currentMaxContentLength) {
                     currentMaxContentLength = contentLine.length;
                 }
-                // If stopLine comes from contentLine being too long, 
-                // new contentLine should start with the word that caused 
+                // If stopLine comes from contentLine being too long,
+                // new contentLine should start with the word that caused
                 // stopLine because it was not added
                 // Otherwise it comes from word containing \n and was therefore
                 // already added to the current contentLine
-                contentLine = word ? " " + word.replace("\n", "") : "";
+                contentLine = word ? word.replace("\n", "") : "";
+                wordCount = word ? 1 : 0;
+            } else {
+                wordCount += 1;
             }
-            wordCount += 1;
         }
         // Store last line
         if (contentLine) {
@@ -168,10 +170,9 @@ const getMultilineContent = (inputText, maxContentLen, indentation, commentLine,
 /**
  * @param {string} inputText
  * @param {number} _offsetCount
- * @param {number} maxLineLen
  * @param {string} languageId
  */
-const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
+const getBlock = (inputText, _offsetCount, languageId) => {
 
     // ---------------------------
     // -----    Variables    -----
@@ -183,7 +184,8 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
         boxWidth,
         boxHeight,
         preferBlockComment,
-        layout
+        layout,
+        maxLineLength
     } = utils.getConf();
     let content, cursorOffset, maxContentLength;
     const indentationSize = _offsetCount || 0;
@@ -206,7 +208,7 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
     // remove left indentation (= indentation)
     // remove the left and right width and spaces arount the content
     // remove 2 for commentStart at the beginning of the line
-    const maxContentLen = maxLineLen - indentationSize - 2 * (boxWidth + spaceAround) - commentStart.length;
+    const maxContentLen = maxLineLength - indentationSize - 2 * (boxWidth + spaceAround) - commentStart.length;
 
     // vertical border
     const separator = boxCharacter.repeat(boxWidth);
@@ -219,7 +221,7 @@ const getBlock = (inputText, _offsetCount, maxLineLen, languageId) => {
     // -----   whether or not the input text is on multiple line or not   -----
     // ------------------------------------------------------------------------
     if (
-        (maxLineLen > 0 && inputText.length > maxContentLen) ||
+        (maxLineLength > 0 && inputText.length > maxContentLen) ||
         inputText.indexOf("\n") > -1
     ) {
         const multilineContent = getMultilineContent(
@@ -280,7 +282,6 @@ async function coblockInput() {
 
     let editor = vscode.window.activeTextEditor;
     const languageId = editor.document.languageId;
-    const maxLineLen = utils.getMaxLineLen();
 
     if (editor) {
         let start = editor.selection.start;
@@ -291,7 +292,6 @@ async function coblockInput() {
         } = getBlock(
             input,
             start.character,
-            maxLineLen,
             languageId,
         );
         editor.edit(editBuilder => {
@@ -362,7 +362,6 @@ function coblockLine() {
 
         // console.log(input);
 
-        const maxLineLen = utils.getMaxLineLen()
         const {
             block,
             linesCount,
@@ -370,7 +369,6 @@ function coblockLine() {
         } = getBlock(
             input,
             indentationSize,
-            maxLineLen,
             languageId,
         );
 
